@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>School24 - Deep Link Examples</title>
+
+    <!-- iOS Smart App Banner -->
+    <meta
+      name="apple-itunes-app"
+      content="app-id=YOUR_APP_ID, app-argument=https://app.school24.net.au/"
+    />
+
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .example {
+        background: #f5f5f5;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      button,
+      .button {
+        background: #007aff;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+      }
+      button:hover,
+      .button:hover {
+        background: #0051d5;
+      }
+      code {
+        background: #e0e0e0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 14px;
+      }
+      .install-banner {
+        background: #4caf50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+      }
+      .install-banner.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>School24 Deep Link Integration Examples</h1>
+    <a href="school24://records" class="button">
+      Raw Scheme Test (iOS/Android)
+    </a>
+
+    <div id="installBanner" class="install-banner">
+      <h3>Get the School24 App</h3>
+      <p>Download our app for a better experience</p>
+      <button onclick="redirectToStore()">Download Now</button>
+    </div>
+
+    <div class="example">
+      <h2>1. Simple Universal Link</h2>
+      <p>
+        This link will open the app if installed, otherwise open the website:
+      </p>
+      <a href="https://app.school24.net.au/records" class="button">
+        View Records
+      </a>
+      <br /><br />
+      <code
+        >&lt;a href="https://app.school24.net.au/records"&gt;View
+        Records&lt;/a&gt;</code
+      >
+    </div>
+
+    <!-- Example 2: Custom URL Scheme (Fallback) -->
+    <div class="example">
+      <h2>2. Custom URL Scheme</h2>
+      <p>Direct app opening with custom scheme (requires app installed):</p>
+      <a href="school24://records" class="button"> Open App (Custom Scheme) </a>
+      <br /><br />
+      <code>&lt;a href="school24://records"&gt;Open App&lt;/a&gt;</code>
+    </div>
+
+    <!-- Example 3: Smart Deep Link with Store Fallback -->
+    <div class="example">
+      <h2>3. Smart Deep Link (Recommended)</h2>
+      <p>Tries to open app, falls back to store if not installed:</p>
+      <button onclick="smartDeepLink('/profile')">Open Records (Smart)</button>
+      <br /><br />
+      <pre><code>function smartDeepLink(path) {
+  const universalLink = `https://app.school24.net.au${path}`;
+  window.location.href = universalLink;
+  
+  setTimeout(() => {
+    // Fallback to store if app didn't open
+    redirectToStore();
+  }, 2500);
+}</code></pre>
+    </div>
+
+    <!-- Example 4: Different Routes -->
+    <div class="example">
+      <h2>4. Multiple Routes</h2>
+      <p>Test different app sections:</p>
+      <button onclick="smartDeepLink('/records')">Records</button>
+      <button onclick="smartDeepLink('/profile')">Profile</button>
+      <button onclick="smartDeepLink('/settings')">Settings</button>
+      <button onclick="smartDeepLink('/notifications')">Notifications</button>
+    </div>
+
+    <!-- Example 5: Deep Link with Parameters -->
+    <div class="example">
+      <h2>5. Deep Link with Query Parameters</h2>
+      <p>Pass data to the app:</p>
+      <button onclick="smartDeepLink('/records?id=12345&tab=homework')">
+        Open Specific Record
+      </button>
+      <br /><br />
+      <code>https://app.school24.net.au/records?id=12345&tab=homework</code>
+    </div>
+
+    <!-- Example 6: Detect if App is Installed -->
+    <div class="example">
+      <h2>6. App Detection</h2>
+      <p>Check if app is installed and show appropriate UI:</p>
+      <button onclick="detectAndOpen('/records')">Smart Button</button>
+      <p id="detectionResult"></p>
+    </div>
+
+    <script>
+      // Detect mobile platform
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      const isMobile = isIOS || isAndroid;
+
+      // Show install banner on mobile if app is not detected
+      if (isMobile) {
+        // You can implement app detection logic here
+        // For now, we'll show it after a delay if user hasn't opened app
+        setTimeout(() => {
+          const banner = document.getElementById("installBanner");
+          banner.classList.add("show");
+        }, 3000);
+      }
+
+      // Smart deep link function
+      // function smartDeepLink(path) {
+      //   const universalLink = `https://app.school24.net.au${path}`;
+      //   const customScheme = `school24:/${path}`;
+
+      //   console.log("Attempting to open:", universalLink);
+
+      //   // Try universal link first (works on both platforms)
+      //   window.location.href = universalLink;
+
+      //   // Fallback to custom scheme
+      //   setTimeout(() => {
+      //     console.log("Fallback to custom scheme:", customScheme);
+      //     window.location.href = customScheme;
+      //   }, 500);
+
+      //   // If app didn't open, redirect to store
+      //   setTimeout(() => {
+      //     console.log("App not detected, redirecting to store");
+      //     // This will only execute if user is still on page (app didn't open)
+      //     if (document.hasFocus()) {
+      //       redirectToStore();
+      //     }
+      //   }, 2500);
+      // }
+
+      // function smartDeepLink(path) {
+      //   const customScheme = `school24:/${path}`;
+
+      //   if (isIOS) {
+      //     // iOS: custom scheme via location href
+      //     window.location.href = customScheme;
+      //   } else if (isAndroid) {
+      //     const intentUri = `intent:/${path}#Intent;scheme=school24;package=com.school24.parent;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.school24.parent;end`;
+      //     window.location.href = intentUri;
+      //   }
+
+      //   setTimeout(() => {
+      //     if (document.hasFocus()) {
+      //       redirectToStore();
+      //     }
+      //   }, 2500);
+      // }
+
+      // // Redirect to appropriate app store
+      // function redirectToStore() {
+      //   let storeUrl;
+
+      //   if (isIOS) {
+      //     // Replace with your actual App Store ID
+      //     storeUrl = "https://apps.apple.com/app/id6738653899";
+      //   } else if (isAndroid) {
+      //     storeUrl =
+      //       "https://play.google.com/store/apps/details?id=com.school24.parent";
+      //   } else {
+      //     alert(
+      //       "Please visit the App Store or Google Play to download School24",
+      //     );
+      //     return;
+      //   }
+
+      //   window.location.href = storeUrl;
+      // }
+
+      function smartDeepLink(path) {
+        if (!isMobile) {
+          document.getElementById("desktopMsg").style.display = "block";
+          return;
+        }
+
+        if (isAndroid) {
+          // intent:// is the ONLY reliable way in Chrome on Android
+          const fallback = encodeURIComponent(
+            "https://play.google.com/store/apps/details?id=com.school24.parent",
+          );
+          window.location.href = `intent:/${path}#Intent;scheme=school24;package=com.school24.parent;S.browser_fallback_url=${fallback};end`;
+        } else if (isIOS) {
+          // iOS Safari supports custom schemes directly
+          window.location.href = `school24:/${path}`;
+          setTimeout(() => {
+            if (document.hasFocus()) redirectToStore();
+          }, 2000);
+        }
+      }
+
+      function redirectToStore() {
+        if (isIOS) {
+          window.location.href = "https://apps.apple.com/app/id6738653899";
+        } else if (isAndroid) {
+          window.location.href =
+            "https://play.google.com/store/apps/details?id=com.school24.parent";
+        }
+      }
+
+      // Advanced: Detect if app is installed
+      function detectAndOpen(path) {
+        const startTime = Date.now();
+        const universalLink = `https://school24.net.au${path}`;
+        const resultEl = document.getElementById("detectionResult");
+
+        // Try to open the app
+        window.location.href = universalLink;
+
+        // Check if page lost focus (app opened)
+        const checkInterval = setInterval(() => {
+          if (document.hidden || !document.hasFocus()) {
+            clearInterval(checkInterval);
+            resultEl.textContent = "✅ App opened successfully!";
+            resultEl.style.color = "green";
+          }
+        }, 100);
+
+        // After 2 seconds, assume app is not installed
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          const elapsedTime = Date.now() - startTime;
+
+          if (elapsedTime < 2000 || document.hasFocus()) {
+            resultEl.textContent =
+              "❌ App not installed. Redirecting to store...";
+            resultEl.style.color = "red";
+            setTimeout(() => redirectToStore(), 1000);
+          }
+        }, 2000);
+      }
+
+      // Alternative: Use iframe trick for app detection
+      function openWithIframe(path) {
+        const universalLink = `https://app.school24.net.au${path}`;
+        const customScheme = `school24:/${path}`;
+
+        // Create hidden iframe
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = customScheme;
+        document.body.appendChild(iframe);
+
+        // Fallback to universal link
+        setTimeout(() => {
+          window.location.href = universalLink;
+        }, 500);
+
+        // Cleanup and store redirect
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          if (document.hasFocus()) {
+            redirectToStore();
+          }
+        }, 2500);
+      }
+
+      // Log page visibility changes (useful for debugging)
+      document.addEventListener("visibilitychange", () => {
+        console.log(
+          "Page visibility changed:",
+          document.hidden ? "hidden" : "visible",
+        );
+      });
+
+      // Log page focus changes
+      window.addEventListener("blur", () => {
+        console.log("Page lost focus (app may have opened)");
+      });
+
+      window.addEventListener("focus", () => {
+        console.log("Page gained focus");
+      });
+    </script>
+  </body>
+</html>
