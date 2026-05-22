@@ -62,7 +62,7 @@
 
       // Get the path from URL parameters (e.g., ?path=/records)
       const urlParams = new URLSearchParams(window.location.search);
-      const path = urlParams.get("path") || "/records";
+      const path = urlParams.get("path") || "/";
 
       function openApp() {
         if (!isMobile) {
